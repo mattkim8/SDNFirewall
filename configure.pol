@@ -1,0 +1,139 @@
+Rule Format:
+# RuleNumber,Action,Source MAC,Destination MAC,Source IP,Destination IP,Protocol,Source Port,Destination Port,Comment/Note
+# RuleNumber = this is a rule number to help you track a particular rule - it is not used in the firewall implementation
+# Action = Block or Allow , Allow Rules need to take precedence over Block Rules
+# Source / Destination MAC address in form of xx:xx:xx:xx:xx:xx
+# Source / Destination IP Address in form of xxx.xxx.xxx.xxx/xx in CIDR notation
+# Protocol = integer IP protocol number per IANA (0-254)
+# Source / Destination Port = if Protocol is TCP or UDP, this is the Application Port Number per IANA
+# Comment/Note = this is for your use in tracking rules.
+#
+# Any field not being used for a match should have a '-' character as it's entry (except for RuleNumber/Comment)
+# Do not pad any of the entries (i.e., have a rule like:  1, Block, -, -,...)
+#
+# Warning:  For the IP address, you need to specify an appropriate network address
+# that matches the subnet mask you are using.  For instance, if you want to use a /16
+# subnet mask, then the IP address must be x.x.0.0.  For example, a proper address to 
+# reference a 192.168.10.x/24 network would be 192.168.10.0/24.  A single host
+# is addressed as a single IP address with a /32.  In other words, the host bit for a 
+# subnet other than /32 must be 0.
+#
+# Example Rules:
+1,Block,-,-,10.0.0.1/32,10.0.1.0/24,6,-,80,Block 10.0.0.1 from accessing a web server on the 10.0.1.0/24 network
+2,Allow,-,-,10.0.0.1/32,10.0.1.125/32,6,-,80,Allow 10.0.0.1 to access a web server on 10.0.1.125 overriding previous rule
+
+#Task 1
+3,Allow,-,-,-,10.0.0.1/32,17,-,53,Allow all from accessing 10.0.0.1
+4,Block,-,-,-,10.0.0.2/32,17,-,53,Block all from accessing 10.0.0.21
+3,Allow,-,-,-,10.0.0.1/32,17,-,853,Allow all from accessing 10.0.0.1
+4,Block,-,-,-,10.0.0.2/32,17,-,853,Block all from accessing 10.0.0.21
+5,Allow,-,-,10.0.1.0/24,10.0.0.2/32,17,-,853,Allow US to access 10.0.0.22
+6,Allow,-,-,10.0.0.0/24,10.0.0.2/32,17,-,853,Allow HQ to access 10.0.0.23
+7,Allow,-,-,10.0.20.0/24,10.0.0.2/32,17,-,853,Allow India to access 10.0.0.24
+8,Allow,-,-,10.0.30.0/24,10.0.0.2/32,17,-,853,Allow China to access 10.0.0.25
+9,Allow,-,-,10.0.40.0/24,10.0.0.2/32,17,-,853,Allow UK to access 10.0.0.26
+12,Allow,-,-,10.0.1.0/24,10.0.0.2/32,17,-,53,Allow US to access 10.0.0.28
+13,Allow,-,-,10.0.0.0/24,10.0.0.2/32,17,-,53,Allow HQ to access 10.0.0.29
+14,Allow,-,-,10.0.20.0/24,10.0.0.2/32,17,-,53,Allow India to access 10.0.0.211
+15,Allow,-,-,10.0.30.0/24,10.0.0.2/32,17,-,53,Allow China to access 10.0.0.222
+16,Allow,-,-,10.0.40.0/24,10.0.0.2/32,17,-,53,Allow UK to access 10.0.0.233
+
+#Task 2
+20,Block,-,-,-,10.0.0.60/32,6,-,1194,Block all to hq3 opvpn TCP11
+21,Block,-,-,-,10.0.0.60/32,17,-,1194,Block all to hq3 opvpn UDP
+22,Allow,-,-,10.0.1.33/32,10.0.0.60/32,6,-,1194,allow us3 tcp openvpn
+23,Allow,-,-,10.0.1.33/32,10.0.0.60/32,17,-,1194,allow us3 udp openvpn
+24,Allow,-,-,10.0.40.129/32,10.0.0.60/32,17,-,1194,allow uk3 udp openvpn
+25,Allow,-,-,10.0.40.129/32,10.0.0.60/32,6,-,1194,allow uk3 tcp openvpn
+26,Allow,-,-,10.0.20.3/32,10.0.0.60/32,17,-,1194,allow in3 udp openvpn
+26,Allow,-,-,10.0.20.3/32,10.0.0.60/32,6,-,1194,allow in3 tcp openvpn
+27,Allow,-,-,10.0.30.3/32,10.0.0.60/32,6,-,1194,allow cn3 tcp openvpn
+28,Allow,-,-,10.0.30.3/32,10.0.0.60/32,17,-,1194,allow cn3 udp openvpn
+
+#Task 3
+
+30,Block,-,-,-,10.0.1.0/24,1,-,-,Block all to us network icmp
+31,Block,-,-,-,10.0.40.0/24,1,-,-,Block all to uk network icmp
+32,Block,-,-,-,10.0.20.0/24,1,-,-,Block all to in network icmp
+33,Block,-,-,-,10.0.30.0/24,1,-,-,Block all to cn network icmp
+29,Allow,-,-,-,10.0.0.0/24,1,-,-,Allow all to hq network icmp
+222,Allow,-,-,10.0.0.0/24,10.0.1.0/24,1,-,-,allow ping to hq
+222,Allow,-,-,10.0.0.0/24,10.0.20.0/24,1,-,-,allow ping to hq
+222,Allow,-,-,10.0.0.0/24,10.0.40.0/24,1,-,-,allow ping to hq
+222,Allow,-,-,10.0.0.0/24,10.0.30.0/24,1,-,-,allow ping to hq
+
+#Task 4
+34,Block,-,-,-,10.0.0.0/24,6,-,3389,block all to hq remote
+35,Block,-,-,-,10.0.0.0/24,6,-,5900,block all to hq vm
+36,Block,-,-,-,10.0.1.0/24,6,-,3389,block all to us remote
+37,Block,-,-,-,10.0.1.0/24,6,-,5900,block all to us vm
+38,Block,-,-,-,10.0.40.0/24,6,-,3389,block all to uk remote
+39,Block,-,-,-,10.0.40.0/24,6,-,5900,block all to uk vm
+341,Block,-,-,-,10.0.20.0/24,6,-,3389,block all to in remote
+352,Block,-,-,-,10.0.20.0/24,6,-,5900,block all to in vm
+343,Block,-,-,-,10.0.30.0/24,6,-,3389,block all to cn remote
+354,Block,-,-,-,10.0.30.0/24,6,-,5900,block all to cn vm
+40,Allow,-,-,10.0.1.0/24,10.0.0.0/24,6,-,3389,allow us hq remote
+41,Allow,-,-,10.0.40.0/24,10.0.0.0/24,6,-,3389,allow uk hq remote
+42,Allow,-,-,10.0.20.0/24,10.0.0.0/24,6,-,3389,allow in hq remote
+43,Allow,-,-,10.0.30.0/24,10.0.0.0/24,6,-,3389,allow cn hq remote
+40,Allow,-,-,10.0.1.0/24,10.0.0.0/24,6,-,5900,allow us hq remote
+41,Allow,-,-,10.0.40.0/24,10.0.0.0/24,6,-,5900,allow uk hq remote
+42,Allow,-,-,10.0.20.0/24,10.0.0.0/24,6,-,5900,allow in hq remote
+43,Allow,-,-,10.0.30.0/24,10.0.0.0/24,6,-,5900,allow cn hq remote
+
+
+#Task 5
+50,Block,-,-,10.0.40.129/32,10.0.1.33/32,6,-,8500,u 
+50,Block,-,-,10.0.40.129/32,10.0.1.33/32,17,-,8500,u
+50,Block,-,-,10.0.40.129/32,10.0.1.34/32,6,-,8500,u 
+50,Block,-,-,10.0.40.129/32,10.0.1.34/32,17,-,8500,u
+
+50,Block,-,-,10.0.40.128/32,10.0.1.33/32,6,-,8500,u 
+50,Block,-,-,10.0.40.128/32,10.0.1.33/32,17,-,8500,u
+50,Block,-,-,10.0.40.128/32,10.0.1.34/32,6,-,8500,u 
+50,Block,-,-,10.0.40.128/32,10.0.1.34/32,17,-,8500,u
+
+50,Block,-,-,10.0.40.130/32,10.0.1.33/32,6,-,8500,u 
+50,Block,-,-,10.0.40.130/32,10.0.1.33/32,17,-,8500,u
+50,Block,-,-,10.0.40.130/32,10.0.1.34/32,6,-,8500,u 
+50,Block,-,-,10.0.40.130/32,10.0.1.34/32,17,-,8500,u
+
+50,Block,-,-,10.0.40.131/32,10.0.1.33/32,6,-,8500,u 
+50,Block,-,-,10.0.40.131/32,10.0.1.33/32,17,-,8500,u
+50,Block,-,-,10.0.40.131/32,10.0.1.34/32,6,-,8500,u 
+50,Block,-,-,10.0.40.131/32,10.0.1.34/32,17,-,8500,u
+
+50,Block,-,-,10.0.20.126/32,10.0.1.33/32,6,-,8500,u 
+50,Block,-,-,10.0.20.126/32,10.0.1.33/32,17,-,8500,u
+50,Block,-,-,10.0.20.126/32,10.0.1.34/32,6,-,8500,u 
+50,Block,-,-,10.0.20.126/32,10.0.1.34/32,17,-,8500,u
+
+50,Block,-,-,10.0.20.125/32,10.0.1.33/32,6,-,8500,u 
+50,Block,-,-,10.0.20.125/32,10.0.1.33/32,17,-,8500,u
+50,Block,-,-,10.0.20.125/32,10.0.1.34/32,6,-,8500,u 
+50,Block,-,-,10.0.20.125/32,10.0.1.34/32,17,-,8500,u
+
+50,Block,-,-,10.0.1.125/32,10.0.1.33/32,6,-,8500,u 
+50,Block,-,-,10.0.1.125/32,10.0.1.33/32,17,-,8500,u
+50,Block,-,-,10.0.1.125/32,10.0.1.34/32,6,-,8500,u 
+50,Block,-,-,10.0.1.125/32,10.0.1.34/32,17,-,8500,u
+
+50,Block,-,-,10.0.0.220/32,10.0.1.33/32,6,-,8500,u 
+50,Block,-,-,10.0.0.220/32,10.0.1.33/32,17,-,8500,u
+50,Block,-,-,10.0.0.220/32,10.0.1.34/32,6,-,8500,u 
+50,Block,-,-,10.0.0.220/32,10.0.1.34/32,17,-,8500,u
+
+#Task6
+60,Block,-,-,-,10.0.1.0/24,47,-,-,b all u
+60,Block,-,-,-,10.0.20.0/24,47,-,-,b all u
+60,Block,-,-,-,10.0.30.0/24,47,-,-,b all u
+60,Block,-,-,-,10.0.40.0/24,47,-,-,b all u
+60,Block,-,-,-,10.0.0.0/24,47,-,-,b all u
+
+
+
+
+
+
+
